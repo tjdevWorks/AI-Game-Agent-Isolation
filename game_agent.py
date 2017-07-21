@@ -220,8 +220,6 @@ class MinimaxPlayer(IsolationPlayer):
             v = max(v, self.min_value(game.forecast_move(action), depth-1))
 
         return v
-        # TODO: finish this function!
-        raise NotImplementedError
 
 
 class AlphaBetaPlayer(IsolationPlayer):
@@ -299,5 +297,48 @@ class AlphaBetaPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
+
+        m = (-1, -1)
+        v = float('-inf')
+        for action in game.get_legal_moves():
+            z = max(v, self.min_value(game.forecast_move(action), v, beta, depth))
+            if z>v:
+                v = z
+                m = action
+        return m
         # TODO: finish this function!
         raise NotImplementedError
+
+    def min_value(self, game, alpha, beta, depth):
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        if depth==1:
+            return self.score(game, self)
+
+        v = float('inf')
+
+        for action in game.get_legal_moves():
+            v = min(v, self.max_value(game.forecast_move(action), alpha, beta, depth-1))
+            if v<=alpha:
+                return v
+            beta = min(beta, v)
+
+        return v
+
+    def max_value(self, game, alpha, beta, depth):
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        if depth==1:
+            return self.score(game, self)
+
+        v = float('-inf')
+
+        for action in game.get_legal_moves():
+            v = max(v, self.min_value(game.forecast_move(action), alpha, beta, depth-1))
+            if v>=beta:
+                return v
+            alpha = max(alpha, v)
+
+        return v
