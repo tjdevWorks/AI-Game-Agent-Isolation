@@ -9,6 +9,17 @@ class SearchTimeout(Exception):
     """Subclass base exception for code clarity. """
     pass
 
+def custom_score_generator(game, player, my_weight, opp_weight):
+    if game.is_loser(player):
+        return float('-inf')
+
+    if game.is_winner(player):
+        return float('inf')
+
+    my_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+    return float((my_weight*my_moves) + (opp_weight*opp_moves))
 
 def custom_score(game, player):
     """Calculate the heuristic value of a game state from the point of view
@@ -29,6 +40,9 @@ def custom_score(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
+
+    return custom_score_generator(game, player, 3, 2)
+
     # TODO: finish this function!
     raise NotImplementedError
 
@@ -51,6 +65,9 @@ def custom_score_2(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
+
+    return custom_score_generator(game, player, 1, 2)
+
     # TODO: finish this function!
     raise NotImplementedError
 
@@ -73,6 +90,9 @@ def custom_score_3(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
+
+    return custom_score_generator(game, player, 1, 0)
+
     # TODO: finish this function!
     raise NotImplementedError
 
