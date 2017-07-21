@@ -183,6 +183,43 @@ class MinimaxPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
+        m = (-1,-1)
+        v = float('-inf')
+        for action in game.get_legal_moves():
+            z = max(v, self.min_value(game.forecast_move(action), depth))
+            if z>v:
+                v = z
+                m = action
+
+        return m
+        # TODO: finish this function!
+        raise NotImplementedError
+
+    def min_value(self, game, depth):
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        if depth==1:
+            return self.score(game, self)
+
+        v = float('inf')
+        for action in game.get_legal_moves():
+            v = min(v, self.max_value(game.forecast_move(action), depth-1))
+
+        return v
+
+    def max_value(self, game, depth):
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        if depth==1:
+            return self.score(game, self)
+
+        v = float('-inf')
+        for action in game.get_legal_moves():
+            v = max(v, self.min_value(game.forecast_move(action), depth-1))
+
+        return v
         # TODO: finish this function!
         raise NotImplementedError
 
