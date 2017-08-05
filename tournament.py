@@ -78,7 +78,9 @@ def update(total_wins, wins):
 
 
 def play_matches(cpu_agents, test_agents, num_matches):
-    """Play matches between the test agent and each cpu_agent individually. """
+    """Play matchreturn self.score(game, self), m
+        else:
+            es between the test agent and each cpu_agent individually. """
     total_wins = {agent.player: 0 for agent in test_agents}
     total_timeouts = 0.
     total_forfeits = 0.
