@@ -4,6 +4,8 @@ and include the results in your report.
 """
 import random
 
+#best_score_ab = float('-inf')
+#best_move_ab = (-1, -1)
 
 class SearchTimeout(Exception):
     """Subclass base exception for code clarity. """
@@ -16,10 +18,12 @@ def custom_score_generator(game, player, my_weight, opp_weight):
     if game.is_winner(player):
         return float('inf')
 
-    my_moves = len(game.get_legal_moves(player))
-    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    my_moves = game.get_legal_moves(player)
+    opp_moves = game.get_legal_moves(game.get_opponent(player))
 
-    return float((my_weight*my_moves) + (opp_weight*opp_moves))
+    same_moves = len([sm for sm in my_moves if sm in opp_moves])
+
+    return float((my_weight*len(my_moves)) + (opp_weight*len(opp_moves)) + same_moves)
 
 def custom_score(game, player):
     """Calculate the heuristic value of a game state from the point of view
@@ -32,7 +36,10 @@ def custom_score(game, player):
     game : `isolation.Board`
         An instance of `isolation.Board` encoding the current state of the
         game (e.g., player locations and blocked cells).
-    player : object
+    player : objectif len(legal_moves)==0:
+            return self.score(game, self), m
+        else:
+            m=legal_moves[0]
         A player instance in the current game (i.e., an object corresponding to
         one of the player objects `game.__player_1__` or `game.__player_2__`.)
     Returns
@@ -41,14 +48,19 @@ def custom_score(game, player):
         The heuristic value of the current game state to the specified player.
     """
 
-    return custom_score_generator(game, player, 3, 2)
+    return custom_score_generator(game, player, 1, -2.5)
 
     # TODO: finish this function!
     raise NotImplementedError
 
 
 def custom_score_2(game, player):
-    """Calculate the heuristic value of a game state from the point of view
+    """Calculate the heuristic value of a game state from thelegal_moves = game.get_legal_moves()
+
+        if not legal_moves:
+            return (-1, -1)
+
+        best_move = legal_moves[0] point of view
     of the given player.
     Note: this function should be called from within a Player instance as
     `self.score()` -- you should not need to call this function directly.
@@ -66,7 +78,7 @@ def custom_score_2(game, player):
         The heuristic value of the current game state to the specified player.
     """
 
-    return custom_score_generator(game, player, 1, 2)
+    return custom_score_generator(game, player, 1, -3)
 
     # TODO: finish this function!
     raise NotImplementedError
@@ -205,7 +217,9 @@ class MinimaxPlayer(IsolationPlayer):
 
         m = (-1,-1)
         v = float('-inf')
-        for action in game.get_legal_moves():
+        legal_moves = game.get_legal_moves()
+
+        for action in legal_moves:
             z = max(v, self.min_value(game.forecast_move(action), depth))
             if z>v:
                 v = z
@@ -276,13 +290,21 @@ class AlphaBetaPlayer(IsolationPlayer):
         self.time_left = time_left
         # Initialize the best move so that this function returns something
         # in case the search fails due to timeout
-        best_move = (-1, -1)
+        legal_moves = game.get_legal_moves()
 
+        if not legal_moves:
+            return (-1, -1)
+
+        best_move = legal_moves[0]
+        best_score = float('-inf')
         try:
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
             for d in range(1, 80):
-                best_move = self.alphabeta(game, d)
+                score, move = self.alphabeta(game, d)
+                if score>best_score:
+                    best_score = score
+                    best_move = move
 
         except SearchTimeout:
             pass  # Handle any actions required after timeout as needed
@@ -307,7 +329,8 @@ class AlphaBetaPlayer(IsolationPlayer):
         game : isolation.Board
             An instance of the Isolation game `Board` class representing the
             current game state
-        depth : int
+        depth : intf len(legal_moves)==0:
+            return self.score(game, self), m
             Depth is an integer representing the maximum number of plies to
             search in the game tree before aborting
         alpha : float
@@ -335,12 +358,18 @@ class AlphaBetaPlayer(IsolationPlayer):
 
         m = (-1, -1)
         v = float('-inf')
-        for action in game.get_legal_moves():
+        legal_moves = game.get_legal_moves()
+
+        if depth==0 or len(legal_moves)==0:
+            return self.score(game, self), m
+
+        for action in legal_moves:
             z = max(v, self.min_value(game.forecast_move(action), v, beta, depth))
             if z>v:
                 v = z
                 m = action
-        return m
+
+        return v, m
         # TODO: finish this function!
         raise NotImplementedError
 
